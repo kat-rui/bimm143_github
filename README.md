@@ -9,4 +9,8 @@ My classwork from [BIMM143](https://bioboot.github.io/bimm143_W26/) at UC San Di
   
   Class 05 [Data viz with ggplot](class05/class05.pdf)
 
-  Class 06 etc
+  Class 06 [class06](class06/class06.pdf)
+
+  Class07 [class07](class07/class07.pdf)
+  
+  etc
