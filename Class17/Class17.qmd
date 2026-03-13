@@ -1,0 +1,172 @@
+---
+title: "Class17"
+author: "Kate Ruiz (PID: A17671200)"
+format: pdf
+---
+
+## Core Unix commands
+
+
+Most unix commands have super short names, which makes them quick to type 
+but annoying to learn.  Major file system related commands include:
+pwd: Print working directory
+ls: list files and directories
+cd: change directory
+mkdir: make a new directory
+rm: remove diles and directories (delete) super dangerous
+cp: copy files (source > destination)
+mv: move files or directories (basically rename)
+nano: a wee text command editor (very basic but always available)
+
+## AW EC2 Instance
+Connect to my instance with:
+
+ssh -i ~/Downloads/bimm143_kate.pem ubuntu@ec2-34-219-54-212.us-west-2.compute.amazonaws.com
+
+Secure Copy files between machines, in this case from our instance to our laptop
+
+scp -i ~/Downloads/bimm143_kate.pem ubuntu@ec2-34-219-54-212.us-west-2.compute.amazonaws.com:/home/ubuntu/work/bimm143_github/class16/results.txt .
+
+## PCA 
+
+```{r}
+library(tximport)
+
+# setup the folder and file-names to read
+folders <- dir(pattern="SRR21568*")
+samples <- sub("_quant", "", folders)
+files <- file.path( folders, "abundance.h5" )
+names(files) <- samples
+
+txi.kallisto <- tximport(files, type = "kallisto", txOut = TRUE)
+```
+
+
+```{r}
+head(txi.kallisto$counts)
+```
+
+```{r}
+getwd()
+
+```
+
+```{r}
+list.files()
+```
+
+```{r}
+folders <- dir(pattern = "SRR21568")
+folders
+```
+
+
+```{r}
+samples <- sub("_quant", "", folders)
+samples
+```
+
+
+```{r}
+files <- file.path(folders, "abundance.h5")
+files
+```
+
+```{r}
+names(files) <- samples
+files
+```
+
+```{r}
+txi.kallisto <- tximport(files, type = "kallisto", txOut = TRUE)
+```
+
+```{r}
+if (!requireNamespace("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+
+BiocManager::install("rhdf5")
+```
+
+```{r}
+colSums(txi.kallisto$counts)
+```
+
+```{r}
+sum(rowSums(txi.kallisto$counts)>0)
+```
+
+
+```{r}
+to.keep <- rowSums(txi.kallisto$counts) > 0
+kset.nonzero <- txi.kallisto$counts[to.keep,]
+```
+
+
+```{r}
+keep2 <- apply(kset.nonzero,1,sd)>0
+x <- kset.nonzero[keep2,]
+```
+
+
+```{r}
+pca <- prcomp(t(x), scale=TRUE)
+```
+
+```{r}
+summary(pca)
+```
+
+```{r}
+plot(pca$x[,1], pca$x[,2],
+     col=c("blue","blue","red","red"),
+     xlab="PC1", ylab="PC2", pch=16)
+```
+
+```{r}
+names(pca)
+```
+
+```{r}
+head(pca$x)
+```
+
+```{r}
+df <- as.data.frame(pca$x)
+head(df)
+```
+
+```{r}
+rownames(pca$x)
+```
+
+```{r}
+colnames(df)
+head(df)
+```
+
+```{r}
+df$condition <- c("A", "A", "B", "B")
+head(df)
+```
+
+```{r}
+head(df)
+```
+
+```{r}
+library(ggplot2)
+ggplot(df, aes(x = PC1 , y = PC2 , color = condition)) +
+  geom_point()
+```
+
+```{r}
+ggplot(df, aes(x = PC1 , y = PC3 , color = condition)) +
+  geom_point()
+```
+
+```{r}
+ggplot(df, aes(x = PC2 , y = PC3 , color = condition)) +
+  geom_point()
+```
+
